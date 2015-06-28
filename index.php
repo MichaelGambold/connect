@@ -16,35 +16,24 @@
       require_once('php/connect.php');
 
       # generate query and query database connection
-      $query = "SELECT * FROM customer";
-      $result = mysql_query($query);
-
-      # check if query returned is blank and display error
-      if (!$result) {
-         $message = 'Invalid query: ' . mysql_error() . "\n";
-         $message .= 'Whole query: ' . $query;
-         die($message);
-      }
-      else {
-         echo '<p>data returned</p>';
-      }
+      $query = $dbh->prepare("SELECT * FROM customer");
 
       # output result
-      while ($row = mysql_fetch_assoc($result)) {
-         echo '<tr>';
-         echo '<td>' . $row['cust_id'] . '</td>';
-         echo '<td>' . $row['surname'] . '</td>';
-         echo '<td>' . $row['firstname'] . '</td>';
-         echo '<td>' . $row['initial'] . '</td>';
-         echo '<td>' . $row['title_id'] . '</td>';
-         echo '<td>' . $row['address'] . '</td>';
-         echo '</tr>';
+      if ($query->execute(array())) {
+         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            echo '<tr>';
+            echo '<td>' . $row['cust_id'] . '</td>';
+            echo '<td>' . $row['surname'] . '</td>';
+            echo '<td>' . $row['firstname'] . '</td>';
+            echo '<td>' . $row['initial'] . '</td>';
+            echo '<td>' . $row['title_id'] . '</td>';
+            echo '<td>' . $row['address'] . '</td>';
+            echo '</tr>';
+         }
       }
 
-      # free resources associated with the result set
       # close database connection
-      mysql_free_result($result);
-      mysql_close($dbconn);
+      $dbh = null;
    ?>
    </table>
 

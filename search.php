@@ -1,6 +1,7 @@
-<?php require_once 'php/header.php'; ?>
-<!-- open databae connection -->
-
+<?php 
+   require_once 'php/header.php';
+   require_once 'php/connect.php';
+?>
 
 <!-- form  for user search criteria -->
 <form name="searchForm" action="answer.php" method="get">
@@ -11,10 +12,32 @@
    <input type="text" id="wineryName" name="wineryName"><br>
 
    <label for="region">Region:</label>
-   <?php  echo '<select id="region" name="region"></select>'; ?><br>
+   <select id="region" name="region">
+      <option value="">Please select</option>
+      <?php
+         // get regions from database connection
+         $stmt = $dbh->prepare("SELECT region_id, region_name FROM region");
+         if ($stmt->execute(array())) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+               echo '<option value="' . $row['region_id'] . '">' . $row['region_name'] . '</option>';
+            }
+         }
+      ?>
+   </select><br>
 
    <label for="grapeVariety">Grape Variety:</label>
-   <?php echo '<select id="grapeVariety" name="grapeVariety"></select>'; ?><br>
+   <select id="grapeVariety" name="grapeVariety">
+      <option value="">Please Select</option>
+      <?php
+         // get grape varieties from database connection
+         $stmt = $dbh->prepare("SELECT variety_id, variety FROM grape_variety");
+         if ($stmt->execute(array())) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+               echo '<option value="' . $row['variety_id'] . '">' . $row['variety'] . '</option>';
+            }
+         }
+      ?>
+   </select><br>
 
    <label for="years">Years:</label>
    <?php echo 'TODO: YEAR RANGE, inc ID & NAME'; ?><br>
@@ -33,6 +56,10 @@
    <input type="submit" value="Search" />
 </form>
 
-<!-- close database connection here -->
+<?php 
+   // close database connection
+   $dbh = null;
 
-<?php require_once 'php/footer.php'; ?>
+   // generate footer
+   require_once 'php/footer.php';
+?>
