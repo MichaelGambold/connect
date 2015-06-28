@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-   <title>test.php</title>
-</head>
-
-<body>
+<?php require_once 'php/header.php'; ?>
 <h1>Test output for database</h1>
 <br>
 <table>
@@ -19,7 +13,7 @@
    
    <?php
       # use connect.php to connect to database
-      require_once('connect.php');
+      require_once('php/connect.php');
 
       # generate query and query database connection
       $query = "SELECT * FROM customer";
@@ -30,6 +24,9 @@
          $message = 'Invalid query: ' . mysql_error() . "\n";
          $message .= 'Whole query: ' . $query;
          die($message);
+      }
+      else {
+         echo '<p>data returned</p>';
       }
 
       # output result
@@ -50,5 +47,5 @@
       mysql_close($dbconn);
    ?>
    </table>
-</body>
-</html>
+
+<? require_once 'php/footer.php'; ?>
