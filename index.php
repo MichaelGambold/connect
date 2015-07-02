@@ -14,9 +14,10 @@
    <?php
       # use connect.php to connect to database
       require_once('php/connect.php');
+      $db = db_connect();
 
       # generate query and query database connection
-      $query = $dbh->prepare("SELECT * FROM customer");
+      $query = $db->prepare("SELECT * FROM customer");
 
       # output result
       if ($query->execute(array())) {
@@ -33,7 +34,7 @@
       }
 
       # close database connection
-      $dbh = null;
+      $db = null;
    ?>
    </table>
 

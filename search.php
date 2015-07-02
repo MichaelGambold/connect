@@ -1,6 +1,9 @@
 <?php 
    require_once 'php/header.php';
    require_once 'php/connect.php';
+
+   // create database connection
+   $db = db_connect();
 ?>
 
 <!-- form  for user search criteria -->
@@ -16,8 +19,8 @@
       <option value="">Please select</option>
       <?php
          // get regions from database connection
-         $stmt = $dbh->prepare("SELECT region_id, region_name FROM region");
-         if ($stmt->execute(array())) {
+         $stmt = $db->prepare("SELECT region_id, region_name FROM region");
+         if ($stmt->execute()) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                echo '<option value="' . $row['region_id'] . '">' . $row['region_name'] . '</option>';
             }
@@ -30,8 +33,8 @@
       <option value="">Please Select</option>
       <?php
          // get grape varieties from database connection
-         $stmt = $dbh->prepare("SELECT variety_id, variety FROM grape_variety");
-         if ($stmt->execute(array())) {
+         $stmt = $db->prepare("SELECT variety_id, variety FROM grape_variety");
+         if ($stmt->execute()) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                echo '<option value="' . $row['variety_id'] . '">' . $row['variety'] . '</option>';
             }
@@ -58,7 +61,7 @@
 
 <?php 
    // close database connection
-   $dbh = null;
+   $db = null;
 
    // generate footer
    require_once 'php/footer.php';
