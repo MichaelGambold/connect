@@ -18,7 +18,7 @@
    $maxCost = $_GET['maxCost'];   
 
    // display variables
-   echo 'wine name: ' . $wineName . '<br>';
+   /*echo 'wine name: ' . $wineName . '<br>';
    echo 'winery name: ' . $wineryName . '<br>';
    echo 'region: ' . $region . '<br>';
    echo 'grape variety: ' . $grapeVariety . '<br>';
@@ -28,7 +28,7 @@
    echo 'min wines ordered: ' . $minWinesOrdered . '<br>';
    echo 'min cost: ' . $minCost . '<br>';
    echo 'max cost: ' . $maxCost . '<br>';
-
+*/
    // perform basic server side validation
    try {
       // check years not less or greater than years in database
@@ -79,7 +79,7 @@
       $where[] = "wy.winery_name LIKE CONCAT('%', :wineryName, '%')";
 
    if (!empty($_GET['region']) && $_GET['region'] != 'All')
-      $where[] = "r.region LIKE CONCAT('%', :region, '%')";
+      $where[] = "r.region_name LIKE CONCAT('%', :region, '%')";
 
    if (!empty($_GET['grapeVariety']) && $_GET['grapeVariety'] != 'All')
       $where[] = "gv.grape_blend LIKE CONCAT('%', :grapeVariety, '%')";
@@ -94,7 +94,7 @@
    
 
    // create database statment based on inputs available
-   echo '<br>testing for matches to wine name<br><br>';
+   //echo '<br>testing for matches to wine name<br><br>';
    
    $stmt = $db->prepare("SELECT w.wine_name, wt.wine_type, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.cost, inv.on_hand, ord.ordered 
                          FROM wine w 
@@ -132,7 +132,7 @@
       $stmt->bindParam(':wineryName', $wineryName, PDO::PARAM_STR);
    
    if (!empty($_GET['region']) && $_GET['region'] != 'All')
-      $stmt->bindParam(':region', $region, PDO::PARAM_STR);
+      $stmt->bindParam(':region', $_GET['region'], PDO::PARAM_STR);
 
    if (!empty($_GET['grapeVariety']) && $_GET['grapeVariety'] != 'All')
       $stmt->bindParam(':grapeVariety', $_GET['grapeVariety'], PDO::PARAM_STR);
@@ -145,7 +145,7 @@
    
    $stmt->execute();
 
-   echo '<table><tr>';
+  /* echo '<table><tr>';
    echo '<th>wine name</th>';
    echo '<th>wine type</th>';
    echo '<th>year</th>';
@@ -169,14 +169,15 @@
       echo '<td>' . $row['ordered'] . '</td>'; 
       echo '</tr>';
    }
-   
+   echo '</table>';
+   */
    // save results to session variable
-   // $_SESSION['results'] = $stmt->fetchAll();
+    $_SESSION['results'] = $stmt->fetchAll();
 
    // close database connection
     $db = null;
 
    // redirect to results page
    $resultsPage = 'results.php';
-   //header("Location: $resultsPage");
+   header("Location: $resultsPage");
 ?>
