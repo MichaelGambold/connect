@@ -96,7 +96,7 @@
    // create database statment based on inputs available
    //echo '<br>testing for matches to wine name<br><br>';
    
-   $stmt = $db->prepare("SELECT w.wine_name, wt.wine_type, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.cost, inv.on_hand, ord.ordered 
+   $stmt = $db->prepare("SELECT w.wine_name, wt.wine_type, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.cost, inv.on_hand, ord.ordered, ord.salesRev, w.wine_id
                          FROM wine w 
                          JOIN wine_type wt ON wt.wine_type_id = w.wine_type 
                          JOIN winery wy ON wy.winery_id = w.winery_id 
@@ -106,11 +106,12 @@
                                JOIN grape_variety gv ON gv.variety_id = wv.variety_id 
                                GROUP BY wv.wine_id 
                                ORDER BY wv.wine_id, wv.id DESC) AS gv ON gv.wine_id = w.wine_id 
-                         JOIN inventory inv ON inv.wine_id = w.wine_id 
-                         JOIN (SELECT wine_id, SUM(qty) AS ordered 
-                               FROM items 
+                         JOIN inventory inv ON inv.wine_id = w.wine_id
+                         JOIN (SELECT wine_id, SUM(qty) AS ordered, sum(price) AS salesRev
+                               FROM items
                                GROUP BY wine_id) AS ord ON ord.wine_id = w.wine_id
-                         WHERE " . implode(' AND ', $where));
+                         WHERE " . implode(' AND ', $where) . "
+                         ORDER BY w.wine_id");
    
    // add '%' wild cards for sql parameters where required for LIKE WHERE clauses
    /*$wineName = '%' . $wineName . '%';

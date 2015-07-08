@@ -1,23 +1,25 @@
-<?php
-   echo '<!DOCTYPE html>';
-   echo '<html><head>';
-   echo '<title>test2.php</title>';
+<!DOCTYPE html>
+<html>
+<head>
+<title>Web Database Applications</title>
 
-   // include css files
-   echo '<link rel="stylesheet" type="text/css" href="css/style.css />';
+<!-- include css files -->
+<link rel="stylesheet" type="text/css" href="css/reset.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
 
-   // include javascript files
-   echo '<script src="js/script.js"></script>';
+<!-- include javascript files -->
+<script src="js/script.js"></script>
 
-   echo '</head><body>';
+</head>
+<body>
 
-   // create header element with navigation
-   echo '<header>';
-
-   echo '<nav>';
-   echo '<a href="index.php">Home</a>';
-   echo '<a href="search.php">Search</a>';
-   echo '</nav>';
-
-   echo '</header>';
-?>
+<!-- header element with navigation -->
+<header>
+   <div class="wrapper">
+      <span id="title">Web Database Applications</span>
+      <nav>
+         <a href="index.php">Home</a>
+         <a href="search.php">Search</a>
+      </nav>
+   </div>
+</header>
