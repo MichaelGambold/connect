@@ -9,12 +9,16 @@
 <div id="main-content" class="wrapper">
 
    <!-- form  for user search criteria -->
-   <form name="searchForm" action="answer.php" method="get">
+   <form name="searchForm" action="answer.php" onsubmit="return validateSearchForm()" method="get">
       <label for="wineName">Wine Name:</label>
-      <input type="text" id="wineName" name="wineName"><br>
+      <input type="text" id="wineName" name="wineName">
+      <span id="errorWineName" class="errorMsg">Only alphanumeric allowed</span>
+      <br>
    
       <label for="wineryName">Winery Name:</label>
-      <input type="text" id="wineryName" name="wineryName"><br>
+      <input type="text" id="wineryName" name="wineryName">
+      <span id="errorWineryName" class="errorMsg">Only alphanumeric allowed</span>
+      <br>
 
       <label for="region">Region:</label>
       <select id="region" name="region">
@@ -58,18 +62,29 @@
             echo '<label for="maxYear">Max Year: </label>';
             echo '<input type="number" id ="maxYear" name="maxYear" value="' . $maxYear . '" min="' . $minYear . '" max="' . $maxYear . '">';
          }
-      ?><br>
+      ?>
+      <span id="errorYears" class="errorMsg">Invalid Years</span>
+      <br>
 
       <label for="minWinesInStock">Minimum No. Wines In Stock(per wine):</label>
-      <input type="number" id="minWinesInStock" name="minWinesInStock" value="0" min="0"><br>
+      <input type="number" id="minWinesInStock" name="minWinesInStock" value="0" min="0">
+      <span id="errorInStock" class="errorMsg">Must be greater than zero</span>
+      <br>
 
       <label for="minWinesOrdered">Minumum No. Wines Orders(per wine):</label>
-      <input type="number" id="minWinesOrdered" name="minWinesOrdered" value="0" min="0"><br>
+      <input type="number" id="minWinesOrdered" name="minWinesOrdered" value="0" min="0">
+      <span id="errorOrdered" class="errorMsg">Must be greater than zero</span>
+      <br>
 
       <label for="minCost">Min Cost:</label>
       <input type="text" id="minCost" name="minCost">
+      <span id="errorMinCost" class="errorMsg">Must be greater than zero and not greater than Max Years</span>
+      <br>
+
       <label for="maxCost"> Max Cost:</label>
-      <input type="text" id="maxCost" name="maxCost"><br>
+      <input type="text" id="maxCost" name="maxCost">
+      <span id="errorMaxCost" class="errorMsg">Must be greater than zero and not less than Min Years</span>
+      <br>
 
       <input type="submit" value="Search" />
    </form>

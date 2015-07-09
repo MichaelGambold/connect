@@ -59,7 +59,7 @@
       }
    } catch (Exception $e) {
       // kill page with error
-      die('Error: Invalid search parameters');
+      die('Error: ' . $e->getMessage());
    }
 
    // connect to database

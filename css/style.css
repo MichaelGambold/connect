@@ -50,6 +50,12 @@ p {
    font-size: 14px;
 }
 
+span.errorMsg {
+   color: red;
+   font-style: italic;
+   display: none;
+}
+
 th {
    font-weight: bold;
    text-align: left;
