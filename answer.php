@@ -17,46 +17,67 @@
    $minCost = $_GET['minCost'];
    $maxCost = $_GET['maxCost'];   
 
-   // display variables
-   /*echo 'wine name: ' . $wineName . '<br>';
-   echo 'winery name: ' . $wineryName . '<br>';
-   echo 'region: ' . $region . '<br>';
-   echo 'grape variety: ' . $grapeVariety . '<br>';
-   echo 'min year: ' . $minYear . '<br>';
-   echo 'max year: ' . $maxYear . '<br>';
-   echo 'min wine in stock: ' . $minWinesInStock . '<br>';
-   echo 'min wines ordered: ' . $minWinesOrdered . '<br>';
-   echo 'min cost: ' . $minCost . '<br>';
-   echo 'max cost: ' . $maxCost . '<br>';
-*/
    // perform basic server side validation
    try {
-      // check years not less or greater than years in database
+      // check inputs are alphanumeric
+      $alphaNumRegex = "/^[a-z0-9 ]*$/i";
+      $yearRegex = "/^[12][0-9]{3}$/";
+
+      if (!empty($_GET['wineName']))
+         if (!preg_match($alphaNumRegex, $_GET['wineName']))
+            throw new Exception('Invalid wine name');
+
+      if (!empty($_GET['wineryName']))
+         if (!preg_match($alphaNumRegex, $_GET['wineryName']))
+            throw new Exception('Invalid winery name');
+
+      if (!empty($_GET['region']))
+         if (!preg_match($alphaNumRegex, $_GET['region']))
+            throw new Exception('Invalid region');
+
+      if (!empty($_GET['grapeVariety']))
+         if (!preg_match($alphaNumRegex, $_GET['grapeVariety']))
+            throw new Exception('Invalid grape variety');
+
+      // check years are valid
+      if (!empty($_GET['minYear']))
+         if (!preg_match($yearRegex, $_GET['minYear']))
+            throw new Exception('Invalid min year');
+
+      if (!empty($_GET['maxYear']))
+         if (!preg_match($yearRegex, $_GET['maxYear']))
+            throw new Exception('Invalid max year');
+
+      // check that min year is not greater than max year if it exists
+      if (!empty($_GET['minYear']) && !empty($_GET['maxYear']))
+         if ($_GET['maxYear'] < $_GET['minYear'])
+            throw new Exception('Max year cannot be less the min year');
    
       // check min wine in stock value is not negative
-      if (!empty($_GET['minWinesInStock']) && $_GET['minWinesInStock'] < 0) {
-         throw new Exception('Min wine in stock cannot be negative');
-      }
+      if (!empty($_GET['minWinesInStock']))
+         if ($_GET['minWinesInStock'] < 0)
+            throw new Exception('Min wine in stock cannot be negative');
 
       // check min wines ordered is not negative
-      if (!empty($_GET['minWinesOrdered']) && $_GET['minWinesOrdered'] < 0) {
-         throw new Exception('Min wines ordered cannot be negative');
-      }
-
-      // assignment spec mentions about only having either min or max for cost check for only one
-      if (!empty($_GET['minCost']) && !empty($_GET['maxCost'])) {
-         throw new Exception('Cannot enter both min and max years');
-      }
+      if (!empty($_GET['minWinesOrdered']))
+         if ($_GET['minWinesOrdered'] < 0)
+            throw new Exception('Min wines ordered cannot be negative');
 
       // check min cost is not negative
-      if (!empty($_GET['minCost']) && $_GET['minCost'] < 0) {
-         throw new Exception('Min cost cannot be negative');
-      }
+      if (!empty($_GET['minCost']))
+         if($_GET['minCost'] < 0)
+            throw new Exception('Min cost cannot be negative');
 
       // check max cost is not negative
-      if (!empty($GET['maxCost']) && $_GET['maxCost'] < 0) {
-         throw new Exception('Max Cost cannot be negative');
-      }
+      if (!empty($_GET['maxCost']))
+         if ($_GET['maxCost'] < 0)
+            throw new Exception('Max Cost cannot be negative');
+
+      // check max cost is not less than min cost if they both exists
+      if (!empty($_GET['minCost']) && $_GET['maxCost'])
+         if ($_GET['maxCost'] < $_GET['minCost'])
+            throw new Exception('Max cost cannot be less than min cost');
+      
    } catch (Exception $e) {
       // kill page with error
       die('Error: ' . $e->getMessage());
@@ -93,9 +114,7 @@
 //echo 'where statement: ' . implode(' AND ', $where);
    
 
-   // create database statment based on inputs available
-   //echo '<br>testing for matches to wine name<br><br>';
-   
+   // create database statment based on inputs available   
    $stmt = $db->prepare("SELECT w.wine_name, wt.wine_type, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.cost, inv.on_hand, ord.ordered, ord.salesRev, w.wine_id
                          FROM wine w 
                          JOIN wine_type wt ON wt.wine_type_id = w.wine_type 
@@ -112,12 +131,6 @@
                                GROUP BY wine_id) AS ord ON ord.wine_id = w.wine_id
                          WHERE " . implode(' AND ', $where) . "
                          ORDER BY w.wine_id");
-   
-   // add '%' wild cards for sql parameters where required for LIKE WHERE clauses
-   /*$wineName = '%' . $wineName . '%';
-   $wineryName = '%' . $wineryName . '%';
-   $region = '%' . $region . '%';
-   $grapeVariety = '%' . $grapeVarity . '%';*/
 
    // bind standard parameters
    $stmt->bindParam(':minYear', $_GET['minYear'], PDO::PARAM_INT);
@@ -145,40 +158,15 @@
       $stmt->bindParam(':maxCost', $_GET['maxCost'], PDO::PARAM_STR);
    
    $stmt->execute();
-
-  /* echo '<table><tr>';
-   echo '<th>wine name</th>';
-   echo '<th>wine type</th>';
-   echo '<th>year</th>';
-   echo '<th>winery_name</th>';
-   echo '<th>region</th>';
-   echo '<th>grape variety</th>';
-   echo '<th>cost</th>';
-   echo '<th>num in stock</th>';
-   echo '<th>orders</th>';
-   echo '</tr>';
- 
-   while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      echo '<tr><td>' . $row['wine_name'] . '</td>';
-      echo '<td>' . $row['wine_type'] . '</td>';
-      echo '<td>' . $row['year'] . '</td>';
-      echo '<td>' . $row['winery_name'] . '</td>';
-      echo '<td>' . $row['region_name'] . '</td>';
-      echo '<td>' . $row['grape_blend'] . '</td>';
-      echo '<td>' . $row['cost'] . '</td>';
-      echo '<td>' . $row['on_hand'] . '</td>';
-      echo '<td>' . $row['ordered'] . '</td>'; 
-      echo '</tr>';
-   }
-   echo '</table>';
-   */
-   // save results to session variable
+   
+    // save results to session variable
     $_SESSION['results'] = $stmt->fetchAll();
 
    // close database connection
-    $db = null;
+   $db = null;
 
    // redirect to results page
    $resultsPage = 'results.php';
    header("Location: $resultsPage");
 ?>
+
