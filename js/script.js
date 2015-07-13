@@ -90,7 +90,7 @@ function validateSearchForm() {
 
 // chech alphanumeric regex function
 function validAlphanumeric(string) {
-   var alphanumericRegex = /^[a-z0-9 ]*$/i
+   var alphanumericRegex = /^[a-z0-9 ']*$/i
 
    if (string.match(alphanumericRegex))
       return true;

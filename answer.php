@@ -4,23 +4,11 @@
 
    // add required files
    require 'php/connect.php';
-   
-   // assign get paramaters to variables
-   $wineName = $_GET['wineName'];
-   $wineryName = $_GET['wineryName'];
-   $region = $_GET['region'];
-   $grapeVariety = $_GET['grapeVariety'];
-   $minYear = $_GET['minYear'];
-   $maxYear = $_GET['maxYear'];
-   $minWinesInStock = $_GET['minWinesInStock'];
-   $minWinesOrdered = $_GET['minWinesOrdered'];
-   $minCost = $_GET['minCost'];
-   $maxCost = $_GET['maxCost'];   
 
    // perform basic server side validation
    try {
       // check inputs are alphanumeric
-      $alphaNumRegex = "/^[a-z0-9 ]*$/i";
+      $alphaNumRegex = "/^[a-z0-9 ']*$/i";
       $yearRegex = "/^[12][0-9]{3}$/";
 
       if (!empty($_GET['wineName']))
@@ -77,12 +65,26 @@
       if (!empty($_GET['minCost']) && $_GET['maxCost'])
          if ($_GET['maxCost'] < $_GET['minCost'])
             throw new Exception('Max cost cannot be less than min cost');
-      
+
    } catch (Exception $e) {
       // kill page with error
-      die('Error: ' . $e->getMessage());
+      $_SESSION['errorMsg'] = $e->getMessage();
+      header("Location: error.php");
+     die(); 
    }
 
+   // assign get paramaters to variables
+   $wineName = filter_var($_GET['wineName'], FILTER_SANITIZE_MAGIC_QUOTES);
+   $wineryName = filter_var($_GET['wineryName'], FILTER_SANITIZE_MAGIC_QUOTES);
+   $region = filter_var($_GET['region'], FILTER_SANITIZE_MAGIC_QUOTES);
+   $grapeVariety = filter_var($_GET['grapeVariety'], FILTER_SANITIZE_MAGIC_QUOTES);
+   $minYear = filter_var($_GET['minYear'], FILTER_SANITIZE_NUMBER_INT);
+   $maxYear = filter_var($_GET['maxYear'], FILTER_SANITIZE_NUMBER_INT);;
+   $minWinesInStock = filter_var($_GET['minWinesInStock'], FILTER_SANITIZE_NUMBER_INT);
+   $minWinesOrdered = filter_var($_GET['minWinesOrdered'], FILTER_SANITIZE_NUMBER_INT);
+   $minCost = filter_var($_GET['minCost'], FILTER_SANITIZE_NUMBER_FLOAT);
+   $maxCost = filter_var($_GET['maxCost'], FILTER_SANITIZE_NUMBER_FLOAT);
+   
    // connect to database
    $db = db_connect();
    
@@ -115,9 +117,8 @@
    
 
    // create database statment based on inputs available   
-   $stmt = $db->prepare("SELECT w.wine_name, wt.wine_type, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.cost, inv.on_hand, ord.ordered, ord.salesRev, w.wine_id
-                         FROM wine w 
-                         JOIN wine_type wt ON wt.wine_type_id = w.wine_type 
+   $stmt = $db->prepare("SELECT w.wine_name, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.cost, inv.on_hand, ord.ordered, ord.salesRev, w.wine_id
+                         FROM wine w
                          JOIN winery wy ON wy.winery_id = w.winery_id 
                          JOIN region r ON r.region_id = wy.region_id 
                          JOIN (SELECT wv.wine_id, GROUP_CONCAT(gv.variety SEPARATOR ' ') AS grape_blend 
@@ -130,32 +131,32 @@
                                FROM items
                                GROUP BY wine_id) AS ord ON ord.wine_id = w.wine_id
                          WHERE " . implode(' AND ', $where) . "
-                         ORDER BY w.wine_id");
+                         ORDER BY w.wine_name, gv.grape_blend, w.year");
 
    // bind standard parameters
-   $stmt->bindParam(':minYear', $_GET['minYear'], PDO::PARAM_INT);
-   $stmt->bindParam(':maxYear', $_GET['maxYear'], PDO::PARAM_INT);
-   $stmt->bindParam(':numInStock', $_GET['minWinesInStock'], PDO::PARAM_INT);
-   $stmt->bindParam(':numOrdered', $_GET['minWinesOrdered'], PDO::PARAM_INT);
+   $stmt->bindParam(':minYear', $minYear, PDO::PARAM_INT);
+   $stmt->bindParam(':maxYear', $maxYear, PDO::PARAM_INT);
+   $stmt->bindParam(':numInStock', $minWinesInStock, PDO::PARAM_INT);
+   $stmt->bindParam(':numOrdered', $minWinesOrdered, PDO::PARAM_INT);
 
    // bind optional parameters if required
    if (!empty($_GET['wineName']))
-      $stmt->bindParam(':wineName', $_GET['wineName'], PDO::PARAM_STR);
+      $stmt->bindParam(':wineName', $wineName, PDO::PARAM_STR);
 
    if (!empty($_GET['wineryName']))
       $stmt->bindParam(':wineryName', $wineryName, PDO::PARAM_STR);
    
-   if (!empty($_GET['region']) && $_GET['region'] != 'All')
+   if (!empty($_GET['region']) && $region != 'All')
       $stmt->bindParam(':region', $_GET['region'], PDO::PARAM_STR);
 
-   if (!empty($_GET['grapeVariety']) && $_GET['grapeVariety'] != 'All')
+   if (!empty($_GET['grapeVariety']) && $grapeVariety != 'All')
       $stmt->bindParam(':grapeVariety', $_GET['grapeVariety'], PDO::PARAM_STR);
    
    if (!empty($_GET['minCost']))
-      $stmt->bindParam(':minCost', $_GET['minCost'], PDO::PARAM_STR);
+      $stmt->bindParam(':minCost', $minCost, PDO::PARAM_STR);
 
    if (!empty($_GET['maxCost']))
-      $stmt->bindParam(':maxCost', $_GET['maxCost'], PDO::PARAM_STR);
+      $stmt->bindParam(':maxCost', $maxCost, PDO::PARAM_STR);
    
    $stmt->execute();
    

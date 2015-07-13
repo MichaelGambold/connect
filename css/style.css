@@ -1,6 +1,7 @@
 body {
    font-size: 62.5%;
    font-family: sans-serif;
+   margin-bottom: 50px;
 }
 
 div.wrapper {
@@ -8,6 +9,14 @@ div.wrapper {
    display: block;
    margin-left: auto;
    margin-right: auto;
+}
+
+.text-align-left {
+   text-align: left;
+}
+
+.text-align-right {
+   text-align: right;
 }
 
 header {
@@ -61,37 +70,37 @@ th {
    text-align: left;
 }
 
+td:empty, th:empty {
+   width: 10px;
+}
+
 /* result table columns */
 #tbl-wine-name {
-   width: 90px;
-}
-
-#tbl-wine-type {
-   width: 80px;
-}
-
-#tbl-year {
-   width: 45px;
-}
-
-#tbl-winery-name {
-   width: 215px;
-}
-
-#tbl-region {
-   width: 140px;
+   width: 85px;
 }
 
 #tbl-grape-variety {
-   width: 180px;
+   width: 170px;
+}
+
+#tbl-year {
+   width: 35px;
+}
+
+#tbl-winery-name {
+   width: 250px;
+}
+
+#tbl-region {
+   width: 130px;
 }
 
 #tbl-cost {
-   width: 50px;
+   width: 60px;
 }
 
 #tbl-in-stock {
-   width: 50px;
+   width: 60px;
 }
 
 #tbl-ordered {
@@ -99,7 +108,7 @@ th {
 }
 
 #tbl-sales-revinue {
-   width: 50px;
+   width: 80px;
 }
 
 tr:nth-child(even) {

@@ -9,7 +9,7 @@
 <div id="main-content" class="wrapper">
 
    <!-- form  for user search criteria -->
-   <form name="searchForm" action="answer.php" onsubmit="return validateSearchForm()" method="get">
+   <form name="searchForm" action="answer.php" method="get" onsubmit="return validateSearchForm()">
       <label for="wineName">Wine Name:</label>
       <input type="text" id="wineName" name="wineName">
       <span id="errorWineName" class="errorMsg">Only alphanumeric allowed</span>
