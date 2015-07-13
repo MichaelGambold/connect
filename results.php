@@ -46,9 +46,9 @@
             echo '<td></td>';
             echo '<td class="text-align-left">' . $row['region_name'] . '</td>';
             echo '<td></td>';
-            echo '<td class="text-align-right">$' . $row['cost'] . '</td>';
+            echo '<td class="text-align-right">$' . $row['avg_cost'] . '</td>';
             echo '<td></td>';
-            echo '<td class="text-align-right">' . $row['on_hand'] . '</td>';
+            echo '<td class="text-align-right">' . $row['sum_on_hand'] . '</td>';
             echo '<td></td>';
             echo '<td class="text-align-right">' . $row['ordered'] . '</td>';
             echo '<td></td>';

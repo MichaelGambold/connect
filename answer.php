@@ -92,7 +92,7 @@
    $where = array();
    $where[] = "w.year >= :minYear";
    $where[] = "w.year <=:maxYear";
-   $where[] = "inv.on_hand >= :numInStock";
+   $where[] = "inv.sum_on_hand >= :numInStock";
    $where[] = "ord.ordered >= :numOrdered";
 
    if (!empty($_GET['wineName']))
@@ -115,9 +115,9 @@
 
 //echo 'where statement: ' . implode(' AND ', $where);
    
-
+   try {
    // create database statment based on inputs available   
-   $stmt = $db->prepare("SELECT w.wine_name, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.cost, inv.on_hand, ord.ordered, ord.salesRev, w.wine_id
+   $stmt = $db->prepare("SELECT w.wine_name, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.avg_cost, inv.sum_on_hand, ord.ordered, ord.salesRev, w.wine_id
                          FROM wine w
                          JOIN winery wy ON wy.winery_id = w.winery_id 
                          JOIN region r ON r.region_id = wy.region_id 
@@ -126,7 +126,9 @@
                                JOIN grape_variety gv ON gv.variety_id = wv.variety_id 
                                GROUP BY wv.wine_id 
                                ORDER BY wv.wine_id, wv.id DESC) AS gv ON gv.wine_id = w.wine_id 
-                         JOIN inventory inv ON inv.wine_id = w.wine_id
+                         JOIN (SELECT wine_id, ROUND(SUM(on_hand*cost)/SUM(on_hand),2) AS avg_cost, SUM(on_hand) AS sum_on_hand
+                               FROM inventory
+                               GROUP BY wine_id) AS inv ON inv.wine_id = w.wine_id
                          JOIN (SELECT wine_id, SUM(qty) AS ordered, sum(price) AS salesRev
                                FROM items
                                GROUP BY wine_id) AS ord ON ord.wine_id = w.wine_id
@@ -158,7 +160,13 @@
    if (!empty($_GET['maxCost']))
       $stmt->bindParam(':maxCost', $maxCost, PDO::PARAM_STR);
    
-   $stmt->execute();
+   
+      $stmt->execute();
+   } catch (Exception $e) {
+      $_SESSION['errorMsg'] = $e->getMessage();
+      header("Location: error.php");
+      die(); 
+   }
    
     // save results to session variable
     $_SESSION['results'] = $stmt->fetchAll();
