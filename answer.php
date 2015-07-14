@@ -112,54 +112,51 @@
 
    if (!empty($_GET['maxCost']))
       $where[] = "inv.avg_cost <= :maxCost";
-
-//echo 'where statement: ' . implode(' AND ', $where);
    
    try {
-   // create database statment based on inputs available   
-   $stmt = $db->prepare("SELECT w.wine_name, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.avg_cost, inv.sum_on_hand, ord.ordered, ord.salesRev, w.wine_id
-                         FROM wine w
-                         JOIN winery wy ON wy.winery_id = w.winery_id 
-                         JOIN region r ON r.region_id = wy.region_id 
-                         JOIN (SELECT wv.wine_id, GROUP_CONCAT(gv.variety SEPARATOR ' ') AS grape_blend 
-                               FROM wine_variety wv 
-                               JOIN grape_variety gv ON gv.variety_id = wv.variety_id 
-                               GROUP BY wv.wine_id 
-                               ORDER BY wv.wine_id, wv.id DESC) AS gv ON gv.wine_id = w.wine_id 
-                         JOIN (SELECT wine_id, ROUND(SUM(on_hand*cost)/SUM(on_hand),2) AS avg_cost, SUM(on_hand) AS sum_on_hand
-                               FROM inventory
-                               GROUP BY wine_id) AS inv ON inv.wine_id = w.wine_id
-                         JOIN (SELECT wine_id, SUM(qty) AS ordered, sum(price) AS salesRev
-                               FROM items
-                               GROUP BY wine_id) AS ord ON ord.wine_id = w.wine_id
-                         WHERE " . implode(' AND ', $where) . "
-                         ORDER BY w.wine_name, gv.grape_blend, w.year");
+      // create database statment based on inputs available   
+      $stmt = $db->prepare("SELECT w.wine_name, w.year, wy.winery_name, r.region_name, gv.grape_blend, inv.avg_cost, inv.sum_on_hand, ord.ordered, ord.salesRev, w.wine_id
+                            FROM wine w
+                            JOIN winery wy ON wy.winery_id = w.winery_id 
+                            JOIN region r ON r.region_id = wy.region_id 
+                            JOIN (SELECT wv.wine_id, GROUP_CONCAT(gv.variety SEPARATOR ' ') AS grape_blend 
+                                  FROM wine_variety wv 
+                                  JOIN grape_variety gv ON gv.variety_id = wv.variety_id 
+                                  GROUP BY wv.wine_id 
+                                  ORDER BY wv.wine_id, wv.id DESC) AS gv ON gv.wine_id = w.wine_id 
+                            JOIN (SELECT wine_id, ROUND(SUM(on_hand*cost)/SUM(on_hand),2) AS avg_cost, SUM(on_hand) AS sum_on_hand
+                                  FROM inventory
+                                  GROUP BY wine_id) AS inv ON inv.wine_id = w.wine_id
+                            JOIN (SELECT wine_id, SUM(qty) AS ordered, sum(price) AS salesRev
+                                  FROM items
+                                  GROUP BY wine_id) AS ord ON ord.wine_id = w.wine_id
+                            WHERE " . implode(' AND ', $where) . "
+                            ORDER BY w.wine_name, gv.grape_blend, w.year");
 
-   // bind standard parameters
-   $stmt->bindParam(':minYear', $minYear, PDO::PARAM_INT);
-   $stmt->bindParam(':maxYear', $maxYear, PDO::PARAM_INT);
-   $stmt->bindParam(':numInStock', $minWinesInStock, PDO::PARAM_INT);
-   $stmt->bindParam(':numOrdered', $minWinesOrdered, PDO::PARAM_INT);
+      // bind standard parameters
+      $stmt->bindParam(':minYear', $minYear, PDO::PARAM_INT);
+      $stmt->bindParam(':maxYear', $maxYear, PDO::PARAM_INT);
+      $stmt->bindParam(':numInStock', $minWinesInStock, PDO::PARAM_INT);
+      $stmt->bindParam(':numOrdered', $minWinesOrdered, PDO::PARAM_INT);
 
-   // bind optional parameters if required
-   if (!empty($_GET['wineName']))
-      $stmt->bindParam(':wineName', $wineName, PDO::PARAM_STR);
+      // bind optional parameters if required
+      if (!empty($_GET['wineName']))
+         $stmt->bindParam(':wineName', $wineName, PDO::PARAM_STR);
 
-   if (!empty($_GET['wineryName']))
-      $stmt->bindParam(':wineryName', $wineryName, PDO::PARAM_STR);
+      if (!empty($_GET['wineryName']))
+         $stmt->bindParam(':wineryName', $wineryName, PDO::PARAM_STR);
    
-   if (!empty($_GET['region']) && $region != 'All')
-      $stmt->bindParam(':region', $_GET['region'], PDO::PARAM_STR);
+      if (!empty($_GET['region']) && $region != 'All')
+         $stmt->bindParam(':region', $_GET['region'], PDO::PARAM_STR);
 
-   if (!empty($_GET['grapeVariety']) && $grapeVariety != 'All')
-      $stmt->bindParam(':grapeVariety', $_GET['grapeVariety'], PDO::PARAM_STR);
+      if (!empty($_GET['grapeVariety']) && $grapeVariety != 'All')
+         $stmt->bindParam(':grapeVariety', $_GET['grapeVariety'], PDO::PARAM_STR);
    
-   if (!empty($_GET['minCost']))
-      $stmt->bindParam(':minCost', $minCost, PDO::PARAM_STR);
+      if (!empty($_GET['minCost']))
+         $stmt->bindParam(':minCost', $minCost, PDO::PARAM_STR);
 
-   if (!empty($_GET['maxCost']))
-      $stmt->bindParam(':maxCost', $maxCost, PDO::PARAM_STR);
-   
+      if (!empty($_GET['maxCost']))
+         $stmt->bindParam(':maxCost', $maxCost, PDO::PARAM_STR);
    
       $stmt->execute();
    } catch (Exception $e) {
