@@ -108,10 +108,10 @@
       $where[] = "gv.grape_blend LIKE CONCAT('%', :grapeVariety, '%')";
 
    if (!empty($_GET['minCost']))
-      $where[] = "inv.cost >= :minCost";
+      $where[] = "inv.avg_cost >= :minCost";
 
    if (!empty($_GET['maxCost']))
-      $where[] = "inv.cost <= :maxCost";
+      $where[] = "inv.avg_cost <= :maxCost";
 
 //echo 'where statement: ' . implode(' AND ', $where);
    
